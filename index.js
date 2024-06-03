@@ -48,6 +48,13 @@ async function run() {
             res.send(result)
         })
 
+        // save a jobs data in database
+        app.post('/job', async (req, res)=>{
+            const jobData = req.body
+            const result = await jobsCollection.insertOne(jobData)
+            res.send(result)
+        })
+
         // get a single data from db user id
 
         app.get('/job/:id' , async (req,res)=>{
