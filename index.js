@@ -41,6 +41,13 @@ async function run() {
             res.send(result)
         })
 
+        // save a bid data in database
+        app.post('/bid', async (req, res)=>{
+            const bidData = req.body
+            const result = await bidsCollection.insertOne(bidData)
+            res.send(result)
+        })
+
         // get a single data from db user id
 
         app.get('/job/:id' , async (req,res)=>{
