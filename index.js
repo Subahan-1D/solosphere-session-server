@@ -34,7 +34,7 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         const jobsCollection = client.db("soloSphere").collection("jobs");
         const bidsCollection = client.db("soloSphere").collection("bids");
-        
+
         // get all jobs data from db
         app.get('/jobs', async (req, res) => {
             const result = await jobsCollection.find().toArray()
@@ -42,14 +42,14 @@ async function run() {
         })
 
         // save a bid data in database
-        app.post('/bid', async (req, res)=>{
+        app.post('/bid', async (req, res) => {
             const bidData = req.body
             const result = await bidsCollection.insertOne(bidData)
             res.send(result)
         })
 
         // save a jobs data in database
-        app.post('/job', async (req, res)=>{
+        app.post('/job', async (req, res) => {
             const jobData = req.body
             const result = await jobsCollection.insertOne(jobData)
             res.send(result)
@@ -57,12 +57,46 @@ async function run() {
 
         // get a single data from db user id
 
-        app.get('/job/:id' , async (req,res)=>{
+        app.get('/job/:id', async (req, res) => {
             const id = req.params.id
-            const query = {_id : new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await jobsCollection.findOne(query)
             res.send(result);
         })
+
+        // get all jobs posted specic user
+        app.get('/jobs/:email', async (req, res) => {
+            const email = req.params.email
+            const query = { 'buyer.email': email }
+            const result = await jobsCollection.find(query).toArray()
+            res.send(result)
+
+        })
+        // get delete a job data
+        app.delete('/job/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await jobsCollection.deleteOne(query)
+            res.send(result)
+
+        })
+
+        //  update a job in db
+        app.put('/job/:id', async (req,res) =>{
+            const id = req.params.id
+            const jobData = req.body
+            const query = {_id : new ObjectId (id)}
+            const options = { upsert: true }
+            const updateDoc = {
+                $set: {
+                  ...jobData
+                },
+              }; 
+             const result = await jobsCollection.updateOne(query, updateDoc, options);
+             res.send(result)
+
+        })
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
